@@ -1,0 +1,11 @@
+services:
+  raw_converter:
+    build:
+      context: ./
+    container_name: raw_converter
+    environment:
+      - NUM_WORKERS=${NUM_WORKERS:-4}
+    volumes:
+      - ~/Downloads/ph_raw:/usr/src/app/upload
+      - ~/Downloads/ph_converted:/usr/src/app/converted
+    restart: unless-stopped
