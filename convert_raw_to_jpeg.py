@@ -39,22 +39,22 @@ def process_raw_file(raw_path):
 
     try:
         print(f"🛠 Starting conversion: {raw_path} -> {output_path}")
-        # Open RAW file and process to RGB with improved settings
+
+        # Open RAW file and process to RGB with cropping
         with rawpy.imread(raw_path) as raw:
             rgb = raw.postprocess(
-                use_camera_wb=True,  # Use camera white balance
-                no_auto_bright=True, # Disable auto-brightness adjustment
-                output_bps=8,        # 8-bit output
-                demosaic_algorithm=rawpy.DemosaicAlgorithm.AHD  # High-quality demosaic
+                use_camera_wb=True,           # Use camera white balance
+                no_auto_bright=True,          # Prevent auto brightness adjustment
+                output_bps=8,                 # 8-bit output
+                demosaic_algorithm=rawpy.DemosaicAlgorithm.AHD,  # High-quality demosaic
+                use_auto_wb=False,            # Avoid auto white balance
+                output_color=rawpy.ColorSpace.sRGB,  # Standard RGB color space
+                crop=True                     # Crop black borders
             )
 
         # Save the file as JPEG with high quality
         imageio.imwrite(output_path, rgb, format="JPEG", quality=95)
         print(f"✅ Successfully converted: {raw_path} -> {output_path}")
-
-    except Exception as e:
-        print(f"❌ Error converting {raw_path}: {e}")
-
 
 def scan_and_process_directory():
     """
