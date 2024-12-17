@@ -1,5 +1,5 @@
-# RAW-to-JPEG Converter
-[![Build](https://github.com/rflpazini/raw-to-jpeg/actions/workflows/build.yml/badge.svg)](https://github.com/rflpazini/raw-to-jpeg/actions/workflows/build.yml)
+# RAW-to-JPEG Converter [![Build](https://github.com/rflpazini/raw-to-jpeg/actions/workflows/build.yml/badge.svg)](https://github.com/rflpazini/raw-to-jpeg/actions/workflows/build.yml)
+
 A Python-based tool that monitors a folder for RAW image files, converts them to JPEG format, and saves them in a target directory. The tool supports popular RAW formats like `.arw`, `.dng`, and `.gpr` and uses Docker for easy deployment.
 
 
