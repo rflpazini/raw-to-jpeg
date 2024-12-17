@@ -56,6 +56,10 @@ def process_raw_file(raw_path):
         imageio.imwrite(output_path, rgb, format="JPEG", quality=95)
         print(f"✅ Successfully converted: {raw_path} -> {output_path}")
 
+    except Exception as e:
+        print(f"❌ Error converting {raw_path}: {e}")
+
+
 def scan_and_process_directory():
     """
     Scans the source directory and processes all RAW files.
