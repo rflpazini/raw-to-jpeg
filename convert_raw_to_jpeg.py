@@ -5,11 +5,9 @@ import imageio
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
-# Define source and target directories
 source_dir = "/usr/src/app/upload"
 target_dir = "/usr/src/app/converted"
 
-# Supported RAW file extensions
 RAW_EXTENSIONS = ['.arw', '.dng', '.gpr']
 
 def log_status(message):
@@ -24,41 +22,42 @@ def is_raw_file(file_name):
     """
     return any(file_name.lower().endswith(ext) for ext in RAW_EXTENSIONS)
 
+import numpy as np
+
 def process_raw_file(raw_path):
     """
-    Processes a single RAW file and converts it to JPEG.
+    Processes a single RAW file and converts it to a high-quality JPEG.
     """
-    # Extract filename and create output file path
     filename = os.path.splitext(os.path.basename(raw_path))[0]
     output_path = os.path.join(target_dir, f"{filename}.jpeg")
 
-    # Skip if the output file already exists
     if os.path.exists(output_path):
         print(f"✔ Skipping {raw_path} - {output_path} already exists.")
         return
 
     try:
         print(f"🛠 Starting conversion: {raw_path} -> {output_path}")
-
-        # Open RAW file and process to RGB with cropping
+        
         with rawpy.imread(raw_path) as raw:
             rgb = raw.postprocess(
-                use_camera_wb=True,           # Use camera white balance
-                no_auto_bright=True,          # Prevent auto brightness adjustment
-                output_bps=8,                 # 8-bit output
+                use_camera_wb=True,              # Use camera's white balance
+                no_auto_bright=True,             # Prevent auto-brightness adjustments
+                output_bps=16,                   # 16-bit output for better precision
                 demosaic_algorithm=rawpy.DemosaicAlgorithm.AHD,  # High-quality demosaic
-                use_auto_wb=False,            # Avoid auto white balance
-                output_color=rawpy.ColorSpace.sRGB,  # Standard RGB color space
-                crop=True                     # Crop black borders
+                gamma=(2.2, 4.5),                # Gamma correction for natural contrast
+                chromatic_aberration=(1.0, 1.0), # Reduce chromatic aberration
+                noise_thr=100,                   # Basic noise reduction threshold
+                median_filter_passes=1,          # Apply a median filter for noise removal
             )
 
-        # Save the file as JPEG with high quality
-        imageio.imwrite(output_path, rgb, format="JPEG", quality=95)
+        # Convert 16-bit RGB image to 8-bit for JPEG compatibility
+        rgb_8bit = np.clip(rgb / 256, 0, 255).astype(np.uint8)
+
+        imageio.imwrite(output_path, rgb_8bit, format="JPEG", quality=98)
         print(f"✅ Successfully converted: {raw_path} -> {output_path}")
 
     except Exception as e:
         print(f"❌ Error converting {raw_path}: {e}")
-
 
 def scan_and_process_directory():
     """
